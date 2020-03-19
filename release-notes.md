@@ -20,7 +20,7 @@ With Real Time Aggregates, users will be able to leverage TimescaleDB's
 precomputed continuous aggregates while still getting a real-time view over the
 latest data.
 
-In particular, continous aggregates made it really fast to get aggregate 
+In particular, continous aggregates made it really fast to get aggregate
 answers by precomputing these values (such as the min/max/average value over
 each
 hour). This way, if you are collecting raw data every second, querying hourly
@@ -60,17 +60,12 @@ past releases and how you can learn more.
 
 ### 1.6.1 (2020-03-18)
 
-<<<<<<< HEAD
-This maintenance release contains bugfixes since the 1.6.0 release. We deem it medium priority for upgrading.
-In particular the fixes contained in this maintenance release address bugs in continuous aggregates, time_bucket_gapfill, partial index handling and drop_chunks.
-=======
-This maintenance release contains bugfixes since the 1.6.0 release. We deem it medium priority 
+This maintenance release contains bugfixes since the 1.6.0 release. We deem it medium priority
 for upgrading.
 
-In particular the fixes contained in this maintenance release address bugs in continuous aggregates, time_bucket_gapfill, 
+In particular the fixes contained in this maintenance release address bugs in continuous aggregates, time_bucket_gapfill,
 partial index handling and drop_chunks.
 
->>>>>>> 60be6d1... Update release notes for 1.6.1
 For this release only, you will need to restart the database after upgrade before restoring a backup.
 
 **Minor Features**
@@ -100,22 +95,19 @@ For this release only, you will need to restart the database after upgrade befor
 *  #1740 Fix invalidation entries from multiple caggs on same hypertable
 *  #1743 Fix continuous aggregate materialization timezone handling
 *  #1748 Fix remove_drop_chunks_policy for continuous aggregates
-<<<<<<< HEAD
-=======
 *  #1756 Fix handling of dropped chunks in compression background worker
->>>>>>> 60be6d1... Update release notes for 1.6.1
 
 **Thanks**
-*  @RJPhillips01 for reporting an issue with drop chunks.
-*  @b4eEx for reporting an issue with disabling compression.
-*  @darko408 for reporting an issue with order by on compressed hypertables
-*  @mrechte for reporting an issue with compressing INTERVAL columns
-*  @tstaehli for reporting an issue with ConstraintAwareAppend
-*  @chadshowalter for reporting an issue with partial index on hypertables
-*  @geoffreybennett for reporting an issue with create_hypertable when interrupting operations
-*  @alxndrdude for reporting an issue with background workers during restore
-*  @zcavaliero for reporting and fixing an issue with dropped columns in hypertable_relation_size
-*  @ismailakpolat for reporting an issue with cagg materialization on hypertables with TIMESTAMP column
+* @RJPhillips01 for reporting an issue with drop chunks.
+* @b4eEx for reporting an issue with disabling compression.
+* @darko408 for reporting an issue with order by on compressed hypertables
+* @mrechte for reporting an issue with compressing INTERVAL columns
+* @tstaehli for reporting an issue with ConstraintAwareAppend
+* @chadshowalter for reporting an issue with partial index on hypertables
+* @geoffreybennett for reporting an issue with create_hypertable when interrupting operations
+* @alxndrdude for reporting an issue with background workers during restore
+* @zcavaliero for reporting and fixing an issue with dropped columns in hypertable_relation_size
+* @ismailakpolat for reporting an issue with cagg materialization on hypertables with TIMESTAMP column
 
 ### 1.6.0 (2020-01-14)
 
