@@ -20,7 +20,85 @@ the `conditions` hypertable will still have data stretching back 36 hours.
 For more information on the `drop_chunks` function and related
 parameters, please review the [API documentation][drop_chunks].
 
-### Automatic Data Retention Policies :enterprise_function:
+### Data Retention with Continuous Aggregates
+
+Continuing on the example above, you have discovered that you need
+daily summary of the average, minimum, and maximum temperature for
+each day, so you have created a continuous aggregate
+`conditions_summary_daily` to collect this data:
+
+```sql
+CREATE VIEW conditions_summary_daily
+WITH (timescaledb.continuous) AS
+SELECT device,
+       time_bucket('1 day'::interval, "time") AS bucket,
+       AVG(temperature),
+       MAX(temperature),
+       MIN(temperature)
+FROM conditions
+GROUP BY device, bucket;
+```
+
+When you now try to drop chunks from `conditions` you get an error:
+
+```
+postgres=# SELECT drop_chunks('30 days'::interval, 'conditions');
+ERROR:  cascade_to_materializations options must be set explicitly
+HINT:  Hypertables with continuous aggs must have the cascade_to_materializations option set to either true or false explicitly.
+```
+
+Since the data in `conditions_summary_daily` is now dependent on the
+data in `conditions` you have to explicitly say if you want to remove
+this data from the continuous aggregate using the
+`cascade_to_materializations` option. Not giving a value when there is
+a continuous aggregate defined on a hypertable will generate an error,
+as you can see above. To drop the chunks from `condition` and cascade
+it to drop the corresponding chunks in the continuous aggregate you
+set `cascade_to_materializations` to `TRUE`:
+
+```
+postgres=# SELECT COUNT(*)
+postgres-#   FROM drop_chunks('30 days'::INTERVAL, 'conditions',
+postgres-#                    cascade_to_materializations => TRUE);
+ count
+-------
+    61
+(1 row)
+```
+
+To only remove chunks from the hypertable `conditions` and not cascade
+to dropping chunks on the continuous aggregate
+`conditions_summary_daily` you can provide the value `FALSE` to
+`cascade_to_materialization`, but only after you have removed the
+dependency on the corresponding chunks in the continuous aggregate. To
+do that, use `ALTER VIEW` to change the
+`ignore_invalidation_older_than` parameter in the continuous aggregate
+to the same range that you intend to remove from the hypertable.
+
+```sql
+ALTER VIEW conditions_summary_daily SET (
+   timescaledb.ignore_invalidation_older_than = '29 days'
+);
+
+SELECT drop_chunks('30 days'::interval, 'conditions',
+                   cascade_to_materialization => FALSE);
+```
+
+Dropping chunks from the materialized view is similar to dropping
+chunks from the tables with raw data. You can drop the chunks of the
+continuous aggregate using `drop_chunks`, but you need to set
+`ignore_invalidation_older_than` to ensure that new data outside the
+dropped region does not update the materialized table.
+
+```sql
+ALTER VIEW conditions_summary_daily SET (
+   timescaledb.ignore_invalidation_older_than = '29 days'
+);
+
+SELECT drop_chunks(INTERVAL '30 days', 'conditions_summary_daily');
+```
+
+### Automatic Data Retention Policies
 
 TimescaleDB includes a background job scheduling framework for automating data
 management tasks, such as enabling easy data retention policies.
