@@ -546,7 +546,11 @@ const pageIndex = [
                         href: "#in-depth-weather"
                     }
                 ]
-            }
+            }, {
+                type: HIDDEN_REDIRECT,
+                href: "tutorial-hello-nyc",
+                to: "/tutorials/tutorial-hello-timescale"
+            },
         ]
     }, {
         Title: "API reference",
